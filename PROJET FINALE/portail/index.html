@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail Étudiant - Recherche</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* =============================================
+           VARIABLES CSS — couleurs et ombres globales
+           ============================================= */
+        :root {
+            --primary: #FCC419;
+            --primary-dark: #d4a017;
+            --accent: #007A33;
+            --accent-light: #00a344;
+            --success: #26de81;
+            --danger: #CE1126;
+            --warning: #FCC419;
+            --bg-dark: #1a1a1a;
+            --bg-light: #f8f9fa;
+            --text-light: #ffffff;
+            --text-dark: #1a1a1a;
+            --shadow: rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Image de fond avec transparence */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        /* Dégradé coloré par-dessus l'image */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(252,196,25,0.25) 0%, rgba(0,0,0,0.3) 60%, rgba(0,122,51,0.15) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* =============================================
+           FORMES ANIMÉES EN ARRIÈRE-PLAN
+           ============================================= */
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape:nth-child(1) { width: 300px; height: 300px; top: -150px; left: -150px; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 200px; height: 200px; bottom: -100px; right: 10%; animation-delay: 3s; }
+        .shape:nth-child(3) { width: 150px; height: 150px; top: 50%; right: -75px; animation-delay: 6s; }
+
+        /* Animation de flottement des formes */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33%       { transform: translate(30px, -30px) rotate(120deg); }
+            66%       { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 20px 40px 20px;
+        }
+
+        /* =============================================
+           EN-TÊTE DE L'UNIVERSITÉ
+           ============================================= */
+        .university-header {
+            background: #FCC419;
+            padding: 30px 40px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            border-bottom: 4px solid #007A33;
+        }
+
+        .university-info {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .university-logo {
+            width: 80px; height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #FCC419;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 3px solid #007A33;
+        }
+
+        .university-details h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.8rem;
+            color: #000000;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(255,255,255,0.3);
+        }
+
+        /* =============================================
+           PIED DE PAGE
+           ============================================= */
+        .university-footer {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            padding: 40px;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            margin-top: 50px;
+            border-top: 4px solid #FCC419;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: #FCC419;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #007A33;
+            padding-bottom: 8px;
+        }
+
+        .footer-section ul { list-style: none; padding: 0; }
+
+        .footer-section ul li {
+            margin-bottom: 10px;
+            color: #cccccc;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .footer-section ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #FCC419;
+        }
+
+        .footer-section ul li:hover { color: #FCC419; padding-left: 20px; }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 2px solid #333;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom strong { color: #FCC419; }
+
+        .cameroon-colors { display: inline-flex; gap: 8px; margin: 0 8px; }
+
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .color-green  { background: #007A33; }
+        .color-red    { background: #CE1126; }
+        .color-yellow { background: #FCC419; }
+
+        /* =============================================
+           TITRE PRINCIPAL DE LA PAGE
+           ============================================= */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        h1.page-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            color: #FCC419;
+            letter-spacing: 4px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.8), 0 0 20px rgba(252,196,25,0.4);
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+            font-weight: 300;
+        }
+
+        /* Bouton d'accès à l'interface Admin (fixe en haut à droite) */
+        .admin-btn {
+            position: fixed;
+            top: 30px; right: 30px;
+            background: linear-gradient(135deg, #FCC419, #d4a017);
+            color: #1a1a1a;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: 2px solid #007A33;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(252,196,25,0.4);
+        }
+
+        .admin-btn:hover {
+            background: linear-gradient(135deg, #007A33, #00a344);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(252,196,25,0.6);
+        }
+
+        /* =============================================
+           SECTION DE RECHERCHE PUBLIQUE
+           ============================================= */
+        .search-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out 0.3s backwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Styles génériques pour les champs de saisie */
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        select {
+            flex: 1;
+            padding: 18px 25px;
+            font-size: 1.1rem;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            font-family: 'Work Sans', sans-serif;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 5px 20px rgba(10,61,98,0.1);
+        }
+
+        /* Style global des boutons */
+        button {
+            padding: 18px 45px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, #FCC419, #d4a017);
+            color: #1a1a1a;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(252,196,25,0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(252,196,25,0.6);
+            background: linear-gradient(135deg, #d4a017, #FCC419);
+        }
+
+        button:active { transform: translateY(0); }
+
+        .info-hint {
+            text-align: center;
+            color: #666;
+            font-size: 0.95rem;
+            font-style: italic;
+        }
+
+        /* =============================================
+           MODAL DE CONNEXION ADMIN
+           ============================================= */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--bg-light);
+        }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 40px; height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--bg-light);
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        /* =============================================
+           GROUPES DE FORMULAIRES (LABELS + INPUTS)
+           ============================================= */
+        .form-group { margin-bottom: 20px; }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            border: 2px solid var(--bg-light);
+            border-radius: 10px;
+            font-family: 'Work Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FCC419;
+            box-shadow: 0 5px 15px rgba(252,196,25,0.2);
+        }
+
+        .btn-primary { width: 100%; background: linear-gradient(135deg, #FCC419, #007A33); color: white; margin-top: 10px; }
+        .btn-success { background: linear-gradient(135deg, var(--success), #20bf6b); }
+        .btn-danger  { background: linear-gradient(135deg, var(--danger), #eb3b5a); }
+
+        /* =============================================
+           PANNEAU ADMINISTRATEUR
+           ============================================= */
+        .admin-panel {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--bg-light);
+        }
+
+        .admin-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+        }
+
+        .logout-btn { padding: 12px 30px; font-size: 1rem; }
+
+        /* Grille du formulaire étudiant (disposition automatique en colonnes) */
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Section d'entrée des notes */
+        .grades-input-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 12px;
+        }
+
+        /* Ligne d'une note (matière, note, coef, bouton suppr) */
+        .grade-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .remove-grade-btn { padding: 10px 15px; font-size: 0.9rem; background: var(--danger); }
+        .add-grade-btn    { padding: 12px 25px; font-size: 1rem; width: auto; display: inline-block; margin-top: 10px; }
+
+        /* Liste des étudiants dans le panneau admin */
+        .students-list { margin-top: 30px; }
+
+        .student-item {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid #FCC419;
+        }
+
+        .student-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(252,196,25,0.2);
+        }
+
+        .student-item-info  { flex: 1; }
+        .student-item-name  { font-size: 1.3rem; font-weight: 600; color: #1a1a1a; margin-bottom: 5px; }
+        .student-item-details { color: #666; font-size: 0.95rem; }
+        .student-item-actions { display: flex; gap: 10px; }
+        .btn-small { padding: 10px 20px; font-size: 0.9rem; }
+
+        /* =============================================
+           SECTION RÉSULTATS DE RECHERCHE PUBLIQUE
+           ============================================= */
+        .results-section {
+            display: none;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+        }
+
+        /* Bouton de fermeture des résultats (croix rouge) */
+        .close-results-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(206,17,38,0.3);
+            z-index: 10;
+        }
+
+        .close-results-btn:hover {
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 8px 20px rgba(206,17,38,0.5);
+        }
+
+        /* Carte principale de la fiche étudiant */
+        .student-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid var(--bg-light);
+        }
+
+        /* Avatar généré depuis les initiales de l'étudiant */
+        .student-avatar {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FCC419, #007A33);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 600;
+            font-family: 'Bebas Neue', sans-serif;
+            box-shadow: 0 5px 15px rgba(252,196,25,0.4);
+        }
+
+        .student-info h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .student-id { color: #999; font-size: 1rem; }
+
+        /* Grille des informations générales de l'étudiant */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-item {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #FCC419;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(252,196,25,0.2);
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .info-value { font-size: 1.3rem; color: #1a1a1a; font-weight: 600; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .status-admis  { background: var(--success); color: white; }
+        .status-refuse { background: var(--danger);  color: white; }
+
+        /* =============================================
+           SECTION NOTES ET TABLEAUX
+           ============================================= */
+        .grades-section { margin-top: 30px; }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+            color: #1a1a1a;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #FCC419;
+        }
+
+        .grades-table { width: 100%; border-collapse: collapse; }
+
+        .grades-table th {
+            background: linear-gradient(135deg, #FCC419, #007A33);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+
+        .grades-table th:first-child { border-radius: 8px 0 0 0; }
+        .grades-table th:last-child  { border-radius: 0 8px 0 0; }
+        .grades-table td { padding: 15px; border-bottom: 1px solid var(--bg-light); }
+        .grades-table tr:hover { background: rgba(252,196,25,0.1); }
+
+        /* Couleurs des notes selon le seuil obtenu */
+        .grade           { font-weight: 600; font-size: 1.1rem; }
+        .grade-excellent { color: var(--success); }   /* ≥ 16 */
+        .grade-good      { color: #007A33; }           /* ≥ 14 */
+        .grade-warning   { color: #d4a017; }           /* ≥ 10 */
+        .grade-poor      { color: var(--danger); }     /* < 10 */
+
+        /* Section des absences */
+        .absences-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .absence-card {
+            background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid var(--danger);
+            text-align: center;
+        }
+
+        .absence-count { font-size: 2.5rem; font-weight: 700; color: var(--danger); font-family: 'Bebas Neue', sans-serif; }
+        .absence-label { font-size: 0.9rem; color: #666; text-transform: uppercase; margin-top: 5px; }
+
+        /* Section des tranches de paiement */
+        .tranches-section { margin-top: 30px; }
+
+        .tranches-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tranche-card {
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .tranche-card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .tranche-payee     { background: linear-gradient(135deg, #f0fff4, #dcfce7); border-color: var(--success); }
+        .tranche-non-payee { background: linear-gradient(135deg, #fff5f5, #ffe5e5); border-color: var(--danger); }
+
+        .tranche-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .tranche-status { font-size: 1rem; font-weight: 600; }
+        .tranche-payee     .tranche-status { color: var(--success); }
+        .tranche-non-payee .tranche-status { color: var(--danger); }
+
+        /* Section de validation par semestre */
+        .semester-section { margin-top: 30px; }
+
+        .semester-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .semester-card {
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+
+        .semester-card:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .semester-valide     { background: linear-gradient(135deg, #f0fff4, #dcfce7); border-color: var(--success); }
+        .semester-non-valide { background: linear-gradient(135deg, #fff5f5, #ffe5e5); border-color: var(--danger); }
+
+        .semester-title { font-size: 1rem; font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .semester-status { font-size: 1.3rem; font-weight: 700; }
+        .semester-valide     .semester-status { color: var(--success); }
+        .semester-non-valide .semester-status { color: var(--danger); }
+
+        /* Message affiché quand une info n'est pas encore disponible */
+        .not-available-message {
+            background: linear-gradient(135deg, #fff9e6, #ffe8a3);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px dashed #FCC419;
+            margin-top: 20px;
+        }
+
+        .not-available-message h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: #d4a017; margin-bottom: 10px; letter-spacing: 1px; }
+        .not-available-message p  { color: #666; font-size: 1rem; }
+
+        /* Affichage quand aucun étudiant n'est trouvé */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .no-results-icon { font-size: 4rem; margin-bottom: 20px; }
+        .no-results h3   { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #1a1a1a; margin-bottom: 10px; }
+        .no-results p    { color: #666; font-size: 1.1rem; }
+
+        /* =============================================
+           RESPONSIVE MOBILE
+           ============================================= */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .search-box        { flex-direction: column; }
+            button             { width: 100%; }
+            .student-header    { flex-direction: column; text-align: center; }
+            .info-grid         { grid-template-columns: 1fr; }
+            .admin-btn         { top: 15px; right: 15px; padding: 10px 20px; font-size: 0.9rem; }
+            .student-form      { grid-template-columns: 1fr; }
+            .grade-row         { grid-template-columns: 1fr; }
+            .university-details h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Formes décoratives animées en arrière-plan -->
+    <div class="bg-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <!-- Bouton fixe pour accéder au panneau admin -->
+    <button class="admin-btn" onclick="openLoginModal()">Admin</button>
+
+    <!-- En-tête de l'université -->
+    <div class="university-header">
+        <div class="university-info">
+            <div class="university-logo">UY</div>
+            <div class="university-details">
+                <h1>UNIVERSITÉ DE YASSA</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <header>
+            <h1 class="page-title">PORTAIL ÉTUDIANT</h1>
+            <p class="subtitle">Système de gestion et de recherche des informations académiques</p>
+        </header>
+
+        <!-- ==========================================
+             SECTION PUBLIQUE — Recherche d'un étudiant
+             ========================================== -->
+        <div id="publicSection">
+            <div class="search-section">
+                <div class="search-box">
+                    <!-- Champ de recherche par numéro ou nom -->
+                    <input type="text" id="searchInput" placeholder="Entrez le numéro d'étudiant ou le nom..." />
+                    <button onclick="searchStudent()">Rechercher</button>
+                </div>
+                <p class="info-hint">Recherchez par numéro d'étudiant ou nom complet</p>
+            </div>
+
+            <!-- Résultats de recherche injectés dynamiquement par JS -->
+            <div id="resultsSection" class="results-section"></div>
+        </div>
+
+        <!-- ==========================================
+             PANNEAU ADMINISTRATEUR (masqué par défaut)
+             ========================================== -->
+        <div id="adminPanel" class="admin-panel">
+
+            <div class="admin-header">
+                <h2 class="admin-title">Panneau Administrateur</h2>
+                <button class="logout-btn btn-danger" onclick="logout()">Déconnexion</button>
+            </div>
+
+            <!-- Barre de recherche pour retrouver et modifier un étudiant existant -->
+            <div class="admin-search-section" style="background: var(--bg-light); padding: 25px; border-radius: 12px; margin-bottom: 30px;">
+                <h3 class="section-title" style="font-size: 1.5rem; margin-bottom: 15px;">Rechercher un étudiant à modifier</h3>
+                <div class="search-box">
+                    <input type="text" id="adminSearchInput" class="form-input" placeholder="Rechercher par numéro, nom ou prénom..." style="flex: 1;" />
+                    <button onclick="searchStudentToEdit()" style="padding: 18px 45px;">Rechercher</button>
+                </div>
+                <!-- Résultats de recherche admin injectés dynamiquement -->
+                <div id="searchResults" style="margin-top: 15px;"></div>
+            </div>
+
+            <div class="section-title">Ajouter / Modifier un étudiant</div>
+
+            <!-- Bouton pour réinitialiser le formulaire avant d'ajouter un nouvel étudiant -->
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+                <button class="btn-small" style="background: linear-gradient(135deg, #666, #999);" onclick="clearForm()">
+                    Nouveau (Effacer le formulaire)
+                </button>
+            </div>
+
+            <!-- Grille : informations de base de l'étudiant -->
+            <div class="student-form">
+                <div class="form-group">
+                    <label class="form-label">Numéro Étudiant</label>
+                    <input type="text" id="studentId" class="form-input" placeholder="ET2024XXX" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" id="studentFirstName" class="form-input" placeholder="Jean" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nom</label>
+                    <input type="text" id="studentLastName" class="form-input" placeholder="Dupont" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Classe</label>
+                    <input type="text" id="studentClass" class="form-input" placeholder="Master 1 Informatique" />
+                </div>
+            </div>
+
+            <!-- ========================================
+                 NOUVEAUX CHAMPS : Date et Lieu de naissance
+                 ======================================== -->
+            <div class="student-form">
+                <div class="form-group">
+                    <label class="form-label">Date de Naissance</label>
+                    <!-- Type "date" pour afficher un sélecteur de calendrier natif -->
+                    <input type="date" id="studentDateNaissance" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lieu de Naissance</label>
+                    <input type="text" id="studentLieuNaissance" class="form-input" placeholder="Ex: Yaoundé, Cameroun" />
+                </div>
+            </div>
+
+            <!-- Grille : tranches de paiement de la scolarité -->
+            <div class="student-form">
+                <div class="form-group">
+                    <label class="form-label">Tranche 1</label>
+                    <select id="tranche1" class="form-input">
+                        <option value="payee">Payée</option>
+                        <option value="non-payee">Non payée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tranche 2</label>
+                    <select id="tranche2" class="form-input">
+                        <option value="payee">Payée</option>
+                        <option value="non-payee">Non payée</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tranche 3</label>
+                    <select id="tranche3" class="form-input">
+                        <option value="payee">Payée</option>
+                        <option value="non-payee">Non payée</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Options de visibilité des données sensibles -->
+            <div class="student-form">
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="hideGrades" style="width: auto; cursor: pointer;" />
+                        <span class="form-label" style="margin: 0;">Masquer les notes (non disponibles)</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="hideValidation" style="width: auto; cursor: pointer;" />
+                        <span class="form-label" style="margin: 0;">Masquer les validations (non disponibles)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Grille : nombre d'absences -->
+            <div class="student-form">
+                <div class="form-group">
+                    <label class="form-label">Absences Justifiées</label>
+                    <input type="number" id="absencesJustifiees" class="form-input" value="0" min="0" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Absences Injustifiées</label>
+                    <input type="number" id="absencesInjustifiees" class="form-input" value="0" min="0" />
+                </div>
+            </div>
+
+            <!-- Saisie des notes du Semestre 1 -->
+            <div class="grades-input-section">
+                <div class="section-title" style="font-size: 1.5rem; margin-bottom: 15px;">Notes - Semestre 1</div>
+                <div id="gradesContainerSem1"></div>
+                <button class="add-grade-btn btn-success" onclick="addGradeRow(1)">Ajouter une matière (Sem 1)</button>
+                <!-- Affichage en temps réel de la moyenne du semestre 1 -->
+                <div id="moyenneSem1Display" style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; font-weight: 600; text-align: center;"></div>
+            </div>
+
+            <!-- Saisie des notes du Semestre 2 -->
+            <div class="grades-input-section" style="margin-top: 20px;">
+                <div class="section-title" style="font-size: 1.5rem; margin-bottom: 15px;">Notes - Semestre 2</div>
+                <div id="gradesContainerSem2"></div>
+                <button class="add-grade-btn btn-success" onclick="addGradeRow(2)">Ajouter une matière (Sem 2)</button>
+                <!-- Affichage en temps réel de la moyenne du semestre 2 -->
+                <div id="moyenneSem2Display" style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; font-weight: 600; text-align: center;"></div>
+            </div>
+
+            <!-- Bouton d'enregistrement (appelle addStudent()) -->
+            <button class="btn-primary" onclick="addStudent()">Enregistrer l'étudiant</button>
+
+            <!-- Liste de tous les étudiants enregistrés -->
+            <div class="students-list">
+                <div class="section-title">Liste des étudiants</div>
+                <div id="studentsList"></div>
+            </div>
+
+        </div><!-- fin #adminPanel -->
+    </div><!-- fin .container -->
+
+    <!-- ==========================================
+         MODAL DE CONNEXION ADMIN
+         ========================================== -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Connexion Admin</h3>
+                <!-- Fermer le modal sans se connecter -->
+                <button class="close-btn" onclick="closeLoginModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Identifiant</label>
+                <input type="text" id="adminUsername" class="form-input" placeholder="admin" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input type="password" id="adminPassword" class="form-input" placeholder="••••••••" />
+            </div>
+            <button class="btn-primary" onclick="login()">Se connecter</button>
+            <p class="info-hint" style="margin-top: 15px;">Par défaut: admin / admin123</p>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // COMMUNICATION AVEC LE SERVEUR PHP (remplace localStorage)
+        // ============================================================
+
+        /**
+         * Envoie les données d'un étudiant au serveur via une requête POST.
+         * Le fichier add_student.php se charge de l'insertion/mise à jour en base.
+         */
+        async function saveStudent(studentData) {
+            try {
+                const response = await fetch("add_student.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(studentData)
+                });
+
+                if (!response.ok) throw new Error("Erreur lors de la sauvegarde");
+
+                return await response.json();
+            } catch (error) {
+                console.error("Erreur saveStudent:", error);
+                alert("Impossible de sauvegarder l'étudiant. Vérifiez que le serveur PHP est actif.");
+                throw error;
+            }
+        }
+
+        /**
+         * Récupère la liste complète des étudiants depuis le serveur PHP.
+         * Retourne un tableau JSON d'objets étudiant.
+         */
+        async function getStudentsDatabase() {
+            try {
+                const response = await fetch("get_students.php");
+
+                if (!response.ok) throw new Error("Erreur lors de la récupération");
+
+                return await response.json();
+            } catch (error) {
+                console.error("Erreur getStudentsDatabase:", error);
+                alert("Impossible de récupérer les étudiants. Vérifiez que le serveur PHP est actif.");
+                return [];
+            }
+        }
+
+        /**
+         * Supprime un étudiant via son identifiant unique.
+         * Appelle delete_student.php puis recharge la liste.
+         */
+        async function deleteStudent(id) {
+            try {
+                await fetch("delete_student.php?id=" + id);
+                await loadStudentsList();
+                alert('Étudiant supprimé avec succès !');
+            } catch (error) {
+                console.error("Erreur deleteStudent:", error);
+                alert("Impossible de supprimer l'étudiant. Vérifiez que le serveur PHP est actif.");
+            }
+        }
+
+        // ============================================================
+        // GESTION DES IDENTIFIANTS ADMIN
+        // ============================================================
+
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'admin123'
+        };
+
+        let isAdminLoggedIn = false; // Indique si l'admin est connecté
+        let gradesCounter = 0;       // Compteur unique pour les ID des lignes de notes
+
+        // -- Gestion du modal de connexion --
+
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        /** Vérifie les identifiants et ouvre le panneau admin si corrects */
+        function login() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                isAdminLoggedIn = true;
+                closeLoginModal();
+                showAdminPanel();
+                loadStudentsList(); // Charge immédiatement la liste des étudiants
+            } else {
+                alert('Identifiants incorrects !');
+            }
+        }
+
+        function logout() {
+            isAdminLoggedIn = false;
+            hideAdminPanel();
+            clearForm();
+        }
+
+        // -- Affichage / masquage du panneau admin --
+
+        function showAdminPanel() {
+            document.getElementById('publicSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            // Ajouter une ligne vide par défaut pour chaque semestre
+            addGradeRow(1);
+            addGradeRow(2);
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('publicSection').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        // ============================================================
+        // RECHERCHE DANS LE PANNEAU ADMIN (pour modifier un étudiant)
+        // ============================================================
+
+        async function searchStudentToEdit() {
+            const searchTerm = document.getElementById('adminSearchInput').value.trim().toLowerCase();
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!searchTerm) {
+                resultsDiv.innerHTML = '<p style="color:#999;font-style:italic;text-align:center;">Entrez un numéro, nom ou prénom pour rechercher</p>';
+                return;
+            }
+
+            const students = await getStudentsDatabase();
+
+            // Filtrage sur l'ID, le nom, le prénom ou la combinaison prénom+nom
+            const matchingStudents = students.filter(s =>
+                s.id.toLowerCase().includes(searchTerm) ||
+                s.nom.toLowerCase().includes(searchTerm) ||
+                s.prenom.toLowerCase().includes(searchTerm) ||
+                `${s.prenom} ${s.nom}`.toLowerCase().includes(searchTerm)
+            );
+
+            if (matchingStudents.length === 0) {
+                resultsDiv.innerHTML = '<p style="color:var(--danger);text-align:center;padding:15px;">Aucun étudiant trouvé</p>';
+                return;
+            }
+
+            // Génération du HTML pour chaque résultat trouvé
+            resultsDiv.innerHTML = `
+                <div style="max-height:300px;overflow-y:auto;">
+                    ${matchingStudents.map(student => `
+                        <div class="student-item" style="margin-bottom:10px;">
+                            <div class="student-item-info">
+                                <div class="student-item-name">${student.prenom} ${student.nom}</div>
+                                <div class="student-item-details">${student.id} • ${student.classe}</div>
+                            </div>
+                            <div class="student-item-actions">
+                                <button class="btn-primary btn-small" onclick="selectStudentToEdit('${student.id}')">Sélectionner</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        /** Charge les données de l'étudiant sélectionné dans le formulaire d'édition */
+        async function selectStudentToEdit(id) {
+            await editStudent(id);
+            document.getElementById('adminSearchInput').value = '';
+            document.getElementById('searchResults').innerHTML =
+                '<p style="color:var(--success);text-align:center;padding:15px;font-weight:600;">✓ Étudiant chargé dans le formulaire ci-dessous</p>';
+
+            // Défilement vers le formulaire après un court délai
+            setTimeout(() => {
+                document.querySelector('.section-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+
+        // ============================================================
+        // GESTION DES LIGNES DE NOTES (SEMESTRES)
+        // ============================================================
+
+        /** Ajoute une ligne de saisie (matière / note / coefficient) dans le semestre donné */
+        function addGradeRow(semestre) {
+            const container = document.getElementById(`gradesContainerSem${semestre}`);
+            const rowId = `grade-sem${semestre}-${gradesCounter++}`; // ID unique par ligne
+
+            const row = document.createElement('div');
+            row.className = 'grade-row';
+            row.id = rowId;
+            row.innerHTML = `
+                <input type="text"   class="form-input" placeholder="Matière"      data-field="matiere"      onchange="calculateSemesterAverage(${semestre})" />
+                <input type="number" class="form-input" placeholder="Note /20"     data-field="note"         min="0" max="20" step="0.5" oninput="calculateSemesterAverage(${semestre})" />
+                <input type="number" class="form-input" placeholder="Coef"         data-field="coefficient"  min="1" max="10" oninput="calculateSemesterAverage(${semestre})" />
+                <button class="remove-grade-btn btn-danger btn-small" onclick="removeGradeRow('${rowId}', ${semestre})">Supprimer</button>
+            `;
+
+            container.appendChild(row);
+        }
+
+        /** Supprime une ligne de note par son ID et recalcule la moyenne */
+        function removeGradeRow(rowId, semestre) {
+            const row = document.getElementById(rowId);
+            if (row) {
+                row.remove();
+                calculateSemesterAverage(semestre);
+            }
+        }
+
+        /** Calcule et affiche en temps réel la moyenne pondérée d'un semestre */
+        function calculateSemesterAverage(semestre) {
+            const rows = document.querySelectorAll(`#gradesContainerSem${semestre} .grade-row`);
+            let totalPoints = 0;
+            let totalCoefficients = 0;
+            let hasValidGrades = false;
+
+            rows.forEach(row => {
+                const matiere     = row.querySelector('[data-field="matiere"]').value.trim();
+                const note        = parseFloat(row.querySelector('[data-field="note"]').value);
+                const coefficient = parseInt(row.querySelector('[data-field="coefficient"]').value);
+
+                // On ne comptabilise que les lignes entièrement remplies
+                if (matiere && !isNaN(note) && !isNaN(coefficient)) {
+                    totalPoints      += note * coefficient;
+                    totalCoefficients += coefficient;
+                    hasValidGrades    = true;
+                }
+            });
+
+            const displayDiv = document.getElementById(`moyenneSem${semestre}Display`);
+
+            if (!hasValidGrades || totalCoefficients === 0) {
+                displayDiv.innerHTML = '';
+                return;
+            }
+
+            const moyenne  = totalPoints / totalCoefficients;
+            const isValide = moyenne >= 10; // Seuil de validation à 10/20
+            const color    = isValide ? 'var(--success)' : 'var(--danger)';
+            const status   = isValide ? 'VALIDÉ ✓' : 'NON VALIDÉ ✗';
+
+            displayDiv.innerHTML = `
+                <span style="font-size:1.2rem;">Moyenne Semestre ${semestre} : </span>
+                <span style="font-size:1.5rem;color:${color};">${moyenne.toFixed(2)}/20</span>
+                <span style="margin-left:20px;font-size:1.2rem;color:${color};">${status}</span>
+            `;
+        }
+
+        /** Lit les notes valides du formulaire pour un semestre donné */
+        function getGradesFromForm(semestre) {
+            const grades = [];
+            const rows   = document.querySelectorAll(`#gradesContainerSem${semestre} .grade-row`);
+
+            rows.forEach(row => {
+                const matiere     = row.querySelector('[data-field="matiere"]').value.trim();
+                const note        = parseFloat(row.querySelector('[data-field="note"]').value);
+                const coefficient = parseInt(row.querySelector('[data-field="coefficient"]').value);
+
+                if (matiere && !isNaN(note) && !isNaN(coefficient)) {
+                    grades.push({ matiere, note, coefficient, semestre });
+                }
+            });
+
+            return grades;
+        }
+
+        /** Détermine si un semestre est validé (moyenne ≥ 10) */
+        function calculateSemesterStatus(notes) {
+            if (!notes || notes.length === 0) return 'non-valide';
+
+            let totalPoints = 0, totalCoefficients = 0;
+
+            notes.forEach(note => {
+                totalPoints       += note.note * note.coefficient;
+                totalCoefficients += note.coefficient;
+            });
+
+            const moyenne = totalCoefficients > 0 ? totalPoints / totalCoefficients : 0;
+            return moyenne >= 10 ? 'valide' : 'non-valide';
+        }
+
+        // ============================================================
+        // ENREGISTREMENT D'UN ÉTUDIANT
+        // ============================================================
+
+        async function addStudent() {
+            // Lecture de tous les champs du formulaire
+            const id            = document.getElementById('studentId').value.trim();
+            const prenom        = document.getElementById('studentFirstName').value.trim();
+            const nom           = document.getElementById('studentLastName').value.trim();
+            const classe        = document.getElementById('studentClass').value.trim();
+            const dateNaissance = document.getElementById('studentDateNaissance').value;   // NOUVEAU
+            const lieuNaissance = document.getElementById('studentLieuNaissance').value.trim(); // NOUVEAU
+            const tranche1      = document.getElementById('tranche1').value;
+            const tranche2      = document.getElementById('tranche2').value;
+            const tranche3      = document.getElementById('tranche3').value;
+            const justifiees    = parseInt(document.getElementById('absencesJustifiees').value) || 0;
+            const injustifiees  = parseInt(document.getElementById('absencesInjustifiees').value) || 0;
+            const notesSem1     = getGradesFromForm(1);
+            const notesSem2     = getGradesFromForm(2);
+            const hideGrades    = document.getElementById('hideGrades').checked;
+            const hideValidation = document.getElementById('hideValidation').checked;
+
+            // Validation des champs obligatoires
+            if (!id || !prenom || !nom || !classe) {
+                alert('Veuillez remplir tous les champs obligatoires (ID, Prénom, Nom, Classe)');
+                return;
+            }
+
+            if ((notesSem1.length === 0 || notesSem2.length === 0) && !hideGrades) {
+                alert('Ajoutez au moins une note pour chaque semestre ou cochez "Masquer les notes"');
+                return;
+            }
+
+            // Calcul automatique du statut de validation par semestre
+            const statut1 = hideGrades ? 'non-valide' : calculateSemesterStatus(notesSem1);
+            const statut2 = hideGrades ? 'non-valide' : calculateSemesterStatus(notesSem2);
+
+            // Construction de l'objet étudiant à envoyer au serveur
+            const studentData = {
+                id, nom, prenom, classe,
+                dateNaissance, // NOUVEAU — format YYYY-MM-DD (issu du champ date)
+                lieuNaissance, // NOUVEAU — chaîne de caractères libre
+                statut: {
+                    semestre1: statut1,
+                    semestre2: statut2
+                },
+                scolarite: {
+                    tranche1, tranche2, tranche3
+                },
+                absences: {
+                    justifiees,
+                    injustifiees,
+                    total: justifiees + injustifiees
+                },
+                notesSem1,
+                notesSem2,
+                hideGrades,
+                hideValidation
+            };
+
+            try {
+                await saveStudent(studentData);
+                alert(
+                    'Étudiant enregistré avec succès !\n\n' +
+                    'Semestre 1 : ' + (statut1 === 'valide' ? 'VALIDÉ ✓' : 'NON VALIDÉ ✗') + '\n' +
+                    'Semestre 2 : ' + (statut2 === 'valide' ? 'VALIDÉ ✓' : 'NON VALIDÉ ✗')
+                );
+                await loadStudentsList();
+                clearForm();
+            } catch (error) {
+                console.error('Erreur lors de l\'enregistrement:', error);
+            }
+        }
+
+        // ============================================================
+        // MODIFICATION D'UN ÉTUDIANT EXISTANT
+        // ============================================================
+
+        /** Pré-remplit le formulaire avec les données d'un étudiant existant */
+        async function editStudent(id) {
+            const students = await getStudentsDatabase();
+            const student  = students.find(s => s.id === id);
+
+            if (!student) return;
+
+            // Remplissage des champs de base
+            document.getElementById('studentId').value        = student.id;
+            document.getElementById('studentFirstName').value = student.prenom;
+            document.getElementById('studentLastName').value  = student.nom;
+            document.getElementById('studentClass').value     = student.classe;
+
+            // NOUVEAU — Remplissage des champs date et lieu de naissance (si existants)
+            document.getElementById('studentDateNaissance').value = student.dateNaissance || '';
+            document.getElementById('studentLieuNaissance').value = student.lieuNaissance || '';
+
+            document.getElementById('tranche1').value             = student.scolarite.tranche1;
+            document.getElementById('tranche2').value             = student.scolarite.tranche2;
+            document.getElementById('tranche3').value             = student.scolarite.tranche3;
+            document.getElementById('absencesJustifiees').value   = student.absences.justifiees;
+            document.getElementById('absencesInjustifiees').value = student.absences.injustifiees;
+            document.getElementById('hideGrades').checked         = student.hideGrades    || false;
+            document.getElementById('hideValidation').checked     = student.hideValidation || false;
+
+            // Réinitialiser les conteneurs de notes avant de recharger
+            document.getElementById('gradesContainerSem1').innerHTML = '';
+            document.getElementById('gradesContainerSem2').innerHTML = '';
+            gradesCounter = 0;
+
+            // Charger les notes du semestre 1
+            if (student.notesSem1 && student.notesSem1.length > 0) {
+                student.notesSem1.forEach(note => {
+                    addGradeRow(1);
+                    const lastRow = document.querySelector('#gradesContainerSem1 .grade-row:last-child');
+                    lastRow.querySelector('[data-field="matiere"]').value      = note.matiere;
+                    lastRow.querySelector('[data-field="note"]').value         = note.note;
+                    lastRow.querySelector('[data-field="coefficient"]').value  = note.coefficient;
+                });
+                calculateSemesterAverage(1);
+            } else {
+                addGradeRow(1); // Ligne vide par défaut
+            }
+
+            // Charger les notes du semestre 2
+            if (student.notesSem2 && student.notesSem2.length > 0) {
+                student.notesSem2.forEach(note => {
+                    addGradeRow(2);
+                    const lastRow = document.querySelector('#gradesContainerSem2 .grade-row:last-child');
+                    lastRow.querySelector('[data-field="matiere"]').value      = note.matiere;
+                    lastRow.querySelector('[data-field="note"]').value         = note.note;
+                    lastRow.querySelector('[data-field="coefficient"]').value  = note.coefficient;
+                });
+                calculateSemesterAverage(2);
+            } else {
+                addGradeRow(2); // Ligne vide par défaut
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        /** Vide tous les champs du formulaire et réinitialise les notes */
+        function clearForm() {
+            document.getElementById('studentId').value            = '';
+            document.getElementById('studentFirstName').value     = '';
+            document.getElementById('studentLastName').value      = '';
+            document.getElementById('studentClass').value         = '';
+            document.getElementById('studentDateNaissance').value = ''; // NOUVEAU
+            document.getElementById('studentLieuNaissance').value = ''; // NOUVEAU
+            document.getElementById('tranche1').value             = 'payee';
+            document.getElementById('tranche2').value             = 'payee';
+            document.getElementById('tranche3').value             = 'payee';
+            document.getElementById('absencesJustifiees').value   = '0';
+            document.getElementById('absencesInjustifiees').value = '0';
+            document.getElementById('hideGrades').checked         = false;
+            document.getElementById('hideValidation').checked     = false;
+            document.getElementById('gradesContainerSem1').innerHTML = '';
+            document.getElementById('gradesContainerSem2').innerHTML = '';
+            document.getElementById('moyenneSem1Display').innerHTML  = '';
+            document.getElementById('moyenneSem2Display').innerHTML  = '';
+            gradesCounter = 0;
+            addGradeRow(1);
+            addGradeRow(2);
+            document.getElementById('adminSearchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        // ============================================================
+        // CHARGEMENT DE LA LISTE DES ÉTUDIANTS (panneau admin)
+        // ============================================================
+
+        async function loadStudentsList() {
+            const students  = await getStudentsDatabase();
+            const container = document.getElementById('studentsList');
+
+            if (students.length === 0) {
+                container.innerHTML = '<p class="info-hint">Aucun étudiant enregistré</p>';
+                return;
+            }
+
+            // Génération d'une ligne par étudiant avec les boutons Modifier / Supprimer
+            container.innerHTML = students.map(student => {
+                const sem1Color = student.statut.semestre1 === 'valide' ? 'var(--success)' : 'var(--danger)';
+                const sem2Color = student.statut.semestre2 === 'valide' ? 'var(--success)' : 'var(--danger)';
+                const sem1Text  = student.statut.semestre1 === 'valide' ? 'S1 : Validé' : 'S1 : Non validé';
+                const sem2Text  = student.statut.semestre2 === 'valide' ? 'S2 : Validé' : 'S2 : Non validé';
+
+                return `
+                <div class="student-item">
+                    <div class="student-item-info">
+                        <div class="student-item-name">${student.prenom} ${student.nom}</div>
+                        <div class="student-item-details">
+                            ${student.id} • ${student.classe} •
+                            <span style="color:${sem1Color}">${sem1Text}</span> •
+                            <span style="color:${sem2Color}">${sem2Text}</span>
+                        </div>
+                    </div>
+                    <div class="student-item-actions">
+                        <button class="btn-primary btn-small" onclick="editStudent('${student.id}')">Modifier</button>
+                        <button class="btn-danger  btn-small" onclick="deleteStudent('${student.id}')">Supprimer</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ============================================================
+        // RECHERCHE PUBLIQUE D'UN ÉTUDIANT
+        // ============================================================
+
+        async function searchStudent() {
+            const searchTerm    = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultsSection = document.getElementById('resultsSection');
+
+            if (!searchTerm) {
+                resultsSection.style.display = 'none';
+                return;
+            }
+
+            const students = await getStudentsDatabase();
+
+            // Recherche flexible : ID, nom, prénom ou combinaison
+            const student = students.find(s =>
+                s.id.toLowerCase().includes(searchTerm) ||
+                s.nom.toLowerCase().includes(searchTerm) ||
+                s.prenom.toLowerCase().includes(searchTerm) ||
+                `${s.prenom} ${s.nom}`.toLowerCase().includes(searchTerm)
+            );
+
+            if (student) {
+                displayStudentInfo(student);
+            } else {
+                displayNoResults();
+            }
+
+            resultsSection.style.display = 'block';
+        }
+
+        // ============================================================
+        // AFFICHAGE DE LA FICHE ÉTUDIANT (vue publique)
+        // ============================================================
+
+        /** Formate une date YYYY-MM-DD en format lisible (ex: 15 mars 2001) */
+        function formatDate(dateStr) {
+            if (!dateStr) return 'Non renseignée';
+            const date = new Date(dateStr + 'T00:00:00'); // Forcer minuit local
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function displayStudentInfo(student) {
+            const resultsSection = document.getElementById('resultsSection');
+
+            // Calcul des moyennes (0 si les notes sont masquées)
+            const moyenneSem1 = student.hideGrades ? 0 : calculateAverageFromNotes(student.notesSem1 || []);
+            const moyenneSem2 = student.hideGrades ? 0 : calculateAverageFromNotes(student.notesSem2 || []);
+
+            // --- Section validation des semestres ---
+            const semesterValidationHTML = student.hideValidation ? `
+                <div class="semester-section">
+                    <h3 class="section-title">Validation des Semestres</h3>
+                    <div class="not-available-message">
+                        <h4>Information Non Disponible</h4>
+                        <p>Les résultats de validation des semestres ne sont pas encore disponibles. Veuillez revenir plus tard.</p>
+                    </div>
+                </div>
+            ` : `
+                <div class="semester-section">
+                    <h3 class="section-title">Validation des Semestres</h3>
+                    <div class="semester-grid">
+                        <div class="semester-card semester-${student.statut.semestre1}">
+                            <div class="semester-title">1er Semestre</div>
+                            <div class="semester-status">
+                                ${student.statut.semestre1 === 'valide' ? 'Validé ✓' : 'Non validé ✗'}
+                            </div>
+                            ${!student.hideGrades ? `<div style="margin-top:10px;font-size:1.1rem;">Moyenne : ${moyenneSem1.toFixed(2)}/20</div>` : ''}
+                        </div>
+                        <div class="semester-card semester-${student.statut.semestre2}">
+                            <div class="semester-title">2e Semestre</div>
+                            <div class="semester-status">
+                                ${student.statut.semestre2 === 'valide' ? 'Validé ✓' : 'Non validé ✗'}
+                            </div>
+                            ${!student.hideGrades ? `<div style="margin-top:10px;font-size:1.1rem;">Moyenne : ${moyenneSem2.toFixed(2)}/20</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // --- Section notes par matière ---
+            const gradesHTML = student.hideGrades ? `
+                <div class="grades-section">
+                    <h3 class="section-title">Notes par Matière</h3>
+                    <div class="not-available-message">
+                        <h4>Information Non Disponible</h4>
+                        <p>Les notes ne sont pas encore disponibles. Les résultats seront publiés prochainement.</p>
+                    </div>
+                </div>
+            ` : `
+                <div class="grades-section">
+                    <h3 class="section-title">Notes - Semestre 1</h3>
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>Matière</th><th>Note</th><th>Coefficient</th><th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(student.notesSem1 || []).map(note => `
+                                <tr>
+                                    <td>${note.matiere}</td>
+                                    <td><span class="grade ${getGradeClass(note.note)}">${note.note.toFixed(1)}/20</span></td>
+                                    <td>${note.coefficient}</td>
+                                    <td>${(note.note * note.coefficient).toFixed(1)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="grades-section" style="margin-top:30px;">
+                    <h3 class="section-title">Notes - Semestre 2</h3>
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>Matière</th><th>Note</th><th>Coefficient</th><th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(student.notesSem2 || []).map(note => `
+                                <tr>
+                                    <td>${note.matiere}</td>
+                                    <td><span class="grade ${getGradeClass(note.note)}">${note.note.toFixed(1)}/20</span></td>
+                                    <td>${note.coefficient}</td>
+                                    <td>${(note.note * note.coefficient).toFixed(1)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // Moyenne générale (si les notes sont visibles)
+            const moyenneGenerale = student.hideGrades ? 0 : (moyenneSem1 + moyenneSem2) / 2;
+            const moyenneHTML = student.hideGrades ? '' : `
+                <div class="info-item">
+                    <div class="info-label">Moyenne Générale</div>
+                    <div class="info-value">${moyenneGenerale.toFixed(2)}/20</div>
+                </div>
+            `;
+
+            // --- Rendu complet de la fiche étudiant ---
+            resultsSection.innerHTML = `
+                <button class="close-results-btn" onclick="closeResults()">×</button>
+                <div class="student-card">
+
+                    <!-- En-tête : avatar + nom + identifiant -->
+                    <div class="student-header">
+                        <div class="student-avatar">
+                            ${student.prenom.charAt(0)}${student.nom.charAt(0)}
+                        </div>
+                        <div class="student-info">
+                            <h2>${student.prenom} ${student.nom}</h2>
+                            <p class="student-id">ID : ${student.id}</p>
+                        </div>
+                    </div>
+
+                    <!-- Grille d'informations générales -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Classe</div>
+                            <div class="info-value">${student.classe}</div>
+                        </div>
+
+                        <!-- NOUVEAU — Date de naissance formatée -->
+                        <div class="info-item">
+                            <div class="info-label">Date de Naissance</div>
+                            <div class="info-value">${formatDate(student.dateNaissance)}</div>
+                        </div>
+
+                        <!-- NOUVEAU — Lieu de naissance -->
+                        <div class="info-item">
+                            <div class="info-label">Lieu de Naissance</div>
+                            <div class="info-value">${student.lieuNaissance || 'Non renseigné'}</div>
+                        </div>
+
+                        ${moyenneHTML}
+                    </div>
+
+                    ${semesterValidationHTML}
+
+                    <!-- Paiement de la scolarité par tranches -->
+                    <div class="tranches-section">
+                        <h3 class="section-title">Scolarité - Tranches de Paiement</h3>
+                        <div class="tranches-grid">
+                            <div class="tranche-card tranche-${student.scolarite.tranche1}">
+                                <div class="tranche-title">Tranche 1</div>
+                                <div class="tranche-status">
+                                    ${student.scolarite.tranche1 === 'payee' ? 'Payée' : 'Non payée'}
+                                </div>
+                            </div>
+                            <div class="tranche-card tranche-${student.scolarite.tranche2}">
+                                <div class="tranche-title">Tranche 2</div>
+                                <div class="tranche-status">
+                                    ${student.scolarite.tranche2 === 'payee' ? 'Payée' : 'Non payée'}
+                                </div>
+                            </div>
+                            <div class="tranche-card tranche-${student.scolarite.tranche3}">
+                                <div class="tranche-title">Tranche 3</div>
+                                <div class="tranche-status">
+                                    ${student.scolarite.tranche3 === 'payee' ? 'Payée' : 'Non payée'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${gradesHTML}
+
+                    <!-- Récapitulatif des absences -->
+                    <div class="grades-section">
+                        <h3 class="section-title">Absences</h3>
+                        <div class="absences-section">
+                            <div class="absence-card">
+                                <div class="absence-count">${student.absences.total}</div>
+                                <div class="absence-label">Total</div>
+                            </div>
+                            <div class="absence-card">
+                                <div class="absence-count">${student.absences.justifiees}</div>
+                                <div class="absence-label">Justifiées</div>
+                            </div>
+                            <div class="absence-card">
+                                <div class="absence-count">${student.absences.injustifiees}</div>
+                                <div class="absence-label">Injustifiées</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        /** Affiche un message d'absence de résultat */
+        function displayNoResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.innerHTML = `
+                <button class="close-results-btn" onclick="closeResults()">×</button>
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <h3>Aucun étudiant trouvé</h3>
+                    <p>Vérifiez le numéro d'étudiant ou le nom saisi</p>
+                </div>
+            `;
+        }
+
+        /** Calcule la moyenne pondérée à partir d'un tableau de notes */
+        function calculateAverageFromNotes(notes) {
+            if (!notes || notes.length === 0) return 0;
+            let totalPoints = 0, totalCoefficients = 0;
+
+            notes.forEach(note => {
+                totalPoints       += note.note * note.coefficient;
+                totalCoefficients += note.coefficient;
+            });
+
+            return totalCoefficients > 0 ? totalPoints / totalCoefficients : 0;
+        }
+
+        /** Masque la section résultats et vide le champ de recherche */
+        function closeResults() {
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+        }
+
+        /**
+         * Retourne la classe CSS correspondant à la note obtenue.
+         * Sert à colorier les notes dans le tableau.
+         */
+        function getGradeClass(note) {
+            if (note >= 16) return 'grade-excellent';
+            if (note >= 14) return 'grade-good';
+            if (note >= 10) return 'grade-warning';
+            return 'grade-poor';
+        }
+
+        // ============================================================
+        // ÉCOUTEURS D'ÉVÉNEMENTS — Raccourcis clavier
+        // ============================================================
+
+        // Touche Entrée sur le champ de recherche public → lancer la recherche
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') searchStudent();
+        });
+
+        // Touche Entrée sur le mot de passe → tenter la connexion
+        document.getElementById('adminPassword').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Touche Entrée sur la recherche admin → lancer la recherche admin
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminSearchInput = document.getElementById('adminSearchInput');
+            if (adminSearchInput) {
+                adminSearchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') searchStudentToEdit();
+                });
+            }
+        });
+
+        // Clic en dehors du modal → fermer le modal de connexion
+        document.getElementById('loginModal').addEventListener('click', function(e) {
+            if (e.target === this) closeLoginModal();
+        });
+    </script>
+
+    <!-- ==========================================
+         PIED DE PAGE DE L'UNIVERSITÉ
+         ========================================== -->
+    <div class="university-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Services d'Enseignement</h3>
+                <ul>
+                    <li>Faculté des Sciences</li>
+                    <li>Faculté des Lettres et Sciences Humaines</li>
+                    <li>Faculté de Médecine et Sciences Biomédicales</li>
+                    <li>École Normale Supérieure</li>
+                    <li>Faculté des Arts, Lettres et Sciences Humaines</li>
+                    <li>École Polytechnique</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Services Administratifs</h3>
+                <ul>
+                    <li>Service de Scolarité</li>
+                    <li>Bibliothèque Universitaire</li>
+                    <li>Service des Affaires Académiques</li>
+                    <li>Service d'Orientation et d'Insertion</li>
+                    <li>Centre des Œuvres Universitaires</li>
+                    <li>Service Médical Universitaire</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Recherche & Innovation</h3>
+                <ul>
+                    <li>Centre de Recherche et de Formation Doctorale</li>
+                    <li>Laboratoires de Recherche</li>
+                    <li>Partenariats Internationaux</li>
+                    <li>Publications Scientifiques</li>
+                    <li>Projets de Développement</li>
+                    <li>Incubateur d'Entreprises</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Vie Estudiantine</h3>
+                <ul>
+                    <li>Associations Étudiantes</li>
+                    <li>Activités Culturelles et Sportives</li>
+                    <li>Résidences Universitaires</li>
+                    <li>Restauration Universitaire</li>
+                    <li>Bourses et Aides Financières</li>
+                    <li>Service de Stages et Emplois</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>
+                <span class="cameroon-colors">
+                    <span class="color-dot color-green"></span>
+                    <span class="color-dot color-red"></span>
+                    <span class="color-dot color-yellow"></span>
+                </span>
+                <strong>Université de Yassa</strong> — Excellence, Innovation, Leadership
+                <span class="cameroon-colors">
+                    <span class="color-dot color-green"></span>
+                    <span class="color-dot color-red"></span>
+                    <span class="color-dot color-yellow"></span>
+                </span>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
